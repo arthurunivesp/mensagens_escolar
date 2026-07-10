@@ -259,20 +259,25 @@ function render() {
 
     return `
       <article class="room ${isOpen ? "is-open" : ""}" data-room="${escapeHtml(group.room)}">
-        <button class="room-summary" type="button" data-action="toggle-room" data-room="${escapeHtml(group.room)}" aria-expanded="${isOpen}">
-          <span class="chevron" aria-hidden="true">&gt;</span>
-          <span class="room-title">
+        <div class="room-summary">
+          <button class="chevron" type="button" data-action="toggle-room" data-room="${escapeHtml(group.room)}" aria-expanded="${isOpen}" aria-label="Abrir ou fechar sala">&gt;</button>
+          <div class="room-title" data-action="toggle-room" data-room="${escapeHtml(group.room)}">
             <span class="room-name">${escapeHtml(group.room)}</span>
             <span class="small">${group.students.length} aluno${group.students.length === 1 ? "" : "s"}</span>
-          </span>
-          <span class="small">Abrir/fechar</span>
-        </button>
+          </div>
+          <div class="room-header-actions">
+            <button class="icon-btn" type="button" data-action="edit-room" data-room="${escapeHtml(group.room)}" title="Editar nome da sala">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            </button>
+            <button class="icon-btn danger" type="button" data-action="delete-room" data-room="${escapeHtml(group.room)}" title="Excluir sala">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+          </div>
+        </div>
         <div class="room-body">
           <div class="room-toolbar">
             <div class="btn-group">
               <button class="btn small-btn primary" type="button" data-action="add-student-room" data-room="${escapeHtml(group.room)}">Adicionar aluno</button>
-              <button class="btn small-btn" type="button" data-action="edit-room" data-room="${escapeHtml(group.room)}">Editar sala</button>
-              <button class="btn small-btn danger" type="button" data-action="delete-room" data-room="${escapeHtml(group.room)}">Excluir sala</button>
             </div>
             
             <div class="room-actions-divider"></div>
@@ -359,7 +364,6 @@ function sendBulkWhatsapp(ids) {
   selected.forEach((item, index) => {
     const link = whatsappLink(item);
     if (link) {
-      // Small delay to prevent browser from blocking popups
       setTimeout(() => {
         window.open(link, "_blank");
       }, index * 800);
@@ -687,8 +691,14 @@ roomsList.addEventListener("click", event => {
     render();
   }
   if (action === "add-student-room") addStudentForRoom(room);
-  if (action === "edit-room") startRoomEdit(room);
-  if (action === "delete-room") deleteRoom(room);
+  if (action === "edit-room") {
+    event.stopPropagation();
+    startRoomEdit(room);
+  }
+  if (action === "delete-room") {
+    event.stopPropagation();
+    deleteRoom(room);
+  }
   
   if (action === "select-student") {
     if (trigger.checked) {

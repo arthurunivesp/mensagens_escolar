@@ -358,13 +358,14 @@ textarea:focus {
   border: 0;
   background: #f0f5f8;
   color: var(--text);
-  padding: 14px;
+  padding: 12px 14px;
   display: grid;
   grid-template-columns: auto 1fr auto;
   gap: 12px;
   align-items: center;
   text-align: left;
   cursor: pointer;
+  position: relative;
 }
 
 .chevron {
@@ -395,6 +396,36 @@ textarea:focus {
   font-size: 1.02rem;
 }
 
+.room-header-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  background: #ffffff;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.icon-btn:hover {
+  background: var(--primary);
+  color: #ffffff;
+  border-color: var(--primary);
+}
+
+.icon-btn.danger:hover {
+  background: var(--rose);
+  border-color: var(--rose);
+}
+
 .room-body {
   display: none;
   border-top: 1px solid var(--line);
@@ -409,7 +440,7 @@ textarea:focus {
   justify-content: space-between;
   gap: 12px;
   align-items: center;
-  padding: 12px 14px;
+  padding: 10px 14px;
   border-bottom: 1px solid var(--line);
   background: #fcfdfe;
   flex-wrap: wrap;
@@ -588,5 +619,13 @@ form {
   }
   .app {
     padding: 12px;
+  }
+  .room-summary {
+    padding: 10px;
+    gap: 8px;
+  }
+  .chevron {
+    width: 26px;
+    height: 26px;
   }
 }
