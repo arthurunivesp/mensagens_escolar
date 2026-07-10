@@ -206,10 +206,9 @@ function render() {
     const isOpen = openRooms.has(group.room) || visibleRooms.length === 1 || search.value.trim();
     if (isOpen) openRooms.add(group.room);
     
-    // Check if any student in this room is selected
-    const selectedCountInRoom = group.students.filter(s => selectedStudentIds.has(String(s.id))).length;
-    const canEdit = selectedCountInRoom === 1;
-    const canDelete = selectedCountInRoom > 0;
+    const selectedInThisRoom = group.students.filter(s => selectedStudentIds.has(String(s.id)));
+    const canEdit = selectedInThisRoom.length === 1;
+    const canAction = selectedInThisRoom.length > 0;
 
     const body = group.students.length ? `
       <div class="table-wrap">
@@ -270,16 +269,18 @@ function render() {
         </button>
         <div class="room-body">
           <div class="room-toolbar">
-            <span class="small">Gerenciar sala ${escapeHtml(group.room)}</span>
-            <div class="actions">
+            <div class="btn-group">
               <button class="btn small-btn primary" type="button" data-action="add-student-room" data-room="${escapeHtml(group.room)}">Adicionar aluno</button>
               <button class="btn small-btn" type="button" data-action="edit-room" data-room="${escapeHtml(group.room)}">Editar sala</button>
               <button class="btn small-btn danger" type="button" data-action="delete-room" data-room="${escapeHtml(group.room)}">Excluir sala</button>
-              
-              <div class="room-actions-group">
-                <button class="btn small-btn" type="button" data-action="edit-selected" ${!canEdit ? "disabled" : ""} title="${canEdit ? "Editar aluno selecionado" : "Selecione exatamente 1 aluno para editar"}">Editar Aluno</button>
-                <button class="btn small-btn danger" type="button" data-action="delete-selected" ${!canDelete ? "disabled" : ""} title="${canDelete ? "Excluir selecionados" : "Selecione alunos para excluir"}">Excluir Aluno</button>
-              </div>
+            </div>
+            
+            <div class="room-actions-divider"></div>
+            
+            <div class="btn-group">
+              <button class="btn small-btn whatsapp" type="button" data-action="whatsapp-selected" ${!canAction ? "disabled" : ""} title="Enviar WhatsApp para selecionados">WhatsApp</button>
+              <button class="btn small-btn" type="button" data-action="edit-selected" ${!canEdit ? "disabled" : ""} title="Editar selecionado">Editar Aluno</button>
+              <button class="btn small-btn danger" type="button" data-action="delete-selected" ${!canAction ? "disabled" : ""} title="Excluir selecionados">Excluir Aluno</button>
             </div>
           </div>
           ${body}
@@ -345,6 +346,25 @@ function deleteStudents(ids) {
   
   saveData();
   render();
+}
+
+function sendBulkWhatsapp(ids) {
+  const selected = students.filter(s => ids.has(String(s.id)));
+  if (!selected.length) return;
+
+  if (selected.length > 5) {
+    if (!confirm(`Voce selecionou ${selected.length} alunos. O navegador abrira varias abas. Continuar?`)) return;
+  }
+
+  selected.forEach((item, index) => {
+    const link = whatsappLink(item);
+    if (link) {
+      // Small delay to prevent browser from blocking popups
+      setTimeout(() => {
+        window.open(link, "_blank");
+      }, index * 800);
+    }
+  });
 }
 
 function startRoomEdit(room) {
@@ -691,6 +711,12 @@ roomsList.addEventListener("click", event => {
       deleteStudents(selectedStudentIds);
     }
   }
+
+  if (action === "whatsapp-selected") {
+    if (selectedStudentIds.size > 0) {
+      sendBulkWhatsapp(selectedStudentIds);
+    }
+  }
 });
 
 search.addEventListener("input", render);
@@ -773,7 +799,7 @@ studentForm.addEventListener("submit", event => {
 
   if (editingStudentId) {
     students = students.map(student => String(student.id) === String(editingStudentId) ? item : student);
-    selectedStudentIds.clear(); // Clear selection after edit
+    selectedStudentIds.clear();
   } else {
     students = [item, ...students];
   }
