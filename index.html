@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Contatos Telefonicos de Alunos</title>
+  <title>Contatos Telefônicos de Alunos</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -26,8 +26,8 @@
             </span>
             <span>Agenda Escolar</span>
           </div>
-          <h1>Contatos telefonicos de alunos</h1>
-          <p>Salas organizadas em efeito sanfona, com cadastro, edicao, exclusao e contato direto pelo WhatsApp.</p>
+          <h1>Contatos telefônicos de alunos</h1>
+          <p>Salas organizadas em efeito sanfona, com cadastro, edição, exclusão e contato direto pelo WhatsApp.</p>
         </div>
         <div class="hero-actions">
           <button class="btn light" type="button" id="scrollForm">Cadastrar aluno</button>
@@ -35,7 +35,7 @@
         </div>
       </div>
       <div class="visual" aria-hidden="true">
-        <svg viewBox="0 0 760 420" role="img" aria-label="Ilustracao de painel escolar com salas e contatos">
+        <svg viewBox="0 0 760 420" role="img" aria-label="Ilustração de painel escolar com salas e contatos">
           <defs>
             <linearGradient id="desk" x1="0" x2="1" y1="0" y2="1">
               <stop offset="0" stop-color="#e8f5f3"/>
@@ -69,10 +69,10 @@
     </section>
 
     <section class="stats" aria-label="Resumo da agenda">
-      <div class="stat"><span>Total de alunos</span><strong id="totalStudents">500</strong></div>
+      <div class="stat"><span>Total de alunos</span><strong id="totalStudents">0</strong></div>
       <div class="stat"><span>Salas cadastradas</span><strong id="totalRooms">0</strong></div>
-      <div class="stat"><span>Resultados visiveis</span><strong id="visibleStudents">0</strong></div>
-      <div class="stat"><span>Contatos WhatsApp</span><strong id="totalWhatsapp">500</strong></div>
+      <div class="stat"><span>Resultados visíveis</span><strong id="visibleStudents">0</strong></div>
+      <div class="stat"><span>Contatos WhatsApp</span><strong id="totalWhatsapp">0</strong></div>
     </section>
 
     <section class="panel toolbar" aria-label="Filtros">
@@ -84,6 +84,14 @@
         <div class="field">
           <label for="roomFilter">Sala</label>
           <select id="roomFilter"></select>
+        </div>
+        <div class="field">
+          <label for="sortOrder">Ordem da lista</label>
+          <select id="sortOrder">
+            <option value="insertion">Ordem de inserção</option>
+            <option value="alphabetical">Ordem alfabética</option>
+            <option value="number">Ordem de número</option>
+          </select>
         </div>
         <button class="btn" type="button" id="clearFilters">Limpar</button>
         <button class="btn primary" type="button" id="exportCsv">Exportar CSV</button>
@@ -97,7 +105,7 @@
             <h2>Salas e alunos</h2>
             <div class="small" id="rangeText">Mostrando registros</div>
           </div>
-          <div class="small">Abra uma sala para ver, editar ou excluir alunos</div>
+          <div class="small">Abra uma sala para ver as informações dos alunos</div>
         </div>
         <div class="rooms-list" id="roomsList"></div>
         <div class="empty hidden" id="emptyState">Nenhuma sala ou aluno encontrado com os filtros atuais.</div>
@@ -113,7 +121,7 @@
           </div>
           <div class="form-actions">
             <button class="btn primary" type="submit" id="saveRoomButton">Adicionar sala</button>
-            <button class="btn hidden" type="button" id="cancelRoomEdit">Cancelar edicao</button>
+            <button class="btn hidden" type="button" id="cancelRoomEdit">Cancelar edição</button>
           </div>
         </form>
 
@@ -121,8 +129,8 @@
           <h2>Sistema de mensagens</h2>
           <div class="small">Edite o texto que vai abrir pronto no WhatsApp.</div>
           <div class="field">
-            <label for="messageTemplate">Mensagem padrao</label>
-            <textarea id="messageTemplate" rows="5">Ola, estou entrando em contato pela escola Armando Gonçalves sobre o aluno {aluno}, da sala {sala}.</textarea>
+            <label for="messageTemplate">Mensagem padrão</label>
+            <textarea id="messageTemplate" rows="5">Olá, estou entrando em contato pela escola Armando Gonçalves sobre o aluno {aluno}, da sala {sala}.</textarea>
           </div>
           <div class="small message-help">Use {aluno}, {sala}, {responsavel} e {telefone} para preencher automaticamente.</div>
         </section>
@@ -136,8 +144,18 @@
               <select id="studentClass" required></select>
             </div>
             <div class="field">
+              <label for="studentNumber">Número na chamada</label>
+              <input id="studentNumber" type="number" required min="1" placeholder="Ex: 1">
+            </div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
               <label for="schoolDoc">Documento escolar</label>
               <input id="schoolDoc" required placeholder="Ex: ESC-2026-0501">
+            </div>
+            <div class="field">
+              <label for="birthDate">Data de nascimento</label>
+              <input id="birthDate" type="date" required>
             </div>
           </div>
           <div class="field">
@@ -149,32 +167,32 @@
             <input id="parentsName" required placeholder="Ex: Ana Silva e Paulo Silva">
           </div>
           <div class="field">
-            <label for="contactName">Nome do contato telefonico</label>
-            <input id="contactName" required placeholder="Responsavel pelo telefone">
+            <label for="contactName">Nome do contato telefônico</label>
+            <input id="contactName" required placeholder="Responsável pelo telefone">
           </div>
           <div class="field">
-            <label for="contactPhone">Numero do contato telefonico</label>
+            <label for="contactPhone">Número do contato telefônico</label>
             <input id="contactPhone" required inputmode="tel" placeholder="Ex: +55 11 98888-0000">
           </div>
           <div class="form-actions">
             <button class="btn primary" type="submit" id="saveStudentButton">Adicionar aluno</button>
-            <button class="btn hidden" type="button" id="cancelStudentEdit">Cancelar edicao</button>
+            <button class="btn hidden" type="button" id="cancelStudentEdit">Cancelar edição</button>
           </div>
         </form>
-        <section class="attendance-panel" aria-label="Planilha de frequencia">
-          <h2>Planilha de frequencia</h2>
-          <div class="small">Gere uma planilha do Excel por sala, com dias letivos do mes escolhido.</div>
+        <section class="attendance-panel" aria-label="Planilha de frequência">
+          <h2>Planilha de frequência</h2>
+          <div class="small">Gere uma planilha do Excel por sala, com dias letivos do mês escolhido.</div>
           <div class="form-grid">
             <div class="field">
               <label for="attendanceRoom">Sala</label>
               <select id="attendanceRoom" required></select>
             </div>
             <div class="field">
-              <label for="attendanceMonth">Mes</label>
+              <label for="attendanceMonth">Mês</label>
               <select id="attendanceMonth" required>
                 <option value="0">Janeiro</option>
                 <option value="1">Fevereiro</option>
-                <option value="2">Marco</option>
+                <option value="2">Março</option>
                 <option value="3">Abril</option>
                 <option value="4">Maio</option>
                 <option value="5">Junho</option>
