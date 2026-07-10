@@ -12,6 +12,7 @@ let visibleRooms = [];
 let editingStudentId = null;
 let editingRoomName = null;
 const openRooms = new Set();
+const selectedStudentIds = new Set();
 
 const roomsList = document.getElementById("roomsList");
 const search = document.getElementById("search");
@@ -204,11 +205,18 @@ function render() {
   roomsList.innerHTML = visibleRooms.map(group => {
     const isOpen = openRooms.has(group.room) || visibleRooms.length === 1 || search.value.trim();
     if (isOpen) openRooms.add(group.room);
+    
+    // Check if any student in this room is selected
+    const selectedCountInRoom = group.students.filter(s => selectedStudentIds.has(String(s.id))).length;
+    const canEdit = selectedCountInRoom === 1;
+    const canDelete = selectedCountInRoom > 0;
+
     const body = group.students.length ? `
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
+              <th class="checkbox-cell"></th>
               <th>Nº</th>
               <th>Aluno</th>
               <th>Nascimento</th>
@@ -216,14 +224,17 @@ function render() {
               <th>Pais</th>
               <th>Contato telefônico</th>
               <th>Número (WhatsApp)</th>
-              <th>Gerenciar</th>
             </tr>
           </thead>
           <tbody>
             ${group.students.map(item => {
               const link = whatsappLink(item);
+              const isSelected = selectedStudentIds.has(String(item.id));
               return `
-                <tr>
+                <tr class="${isSelected ? "is-selected" : ""}">
+                  <td class="checkbox-cell">
+                    <input type="checkbox" data-action="select-student" data-id="${item.id}" ${isSelected ? "checked" : ""}>
+                  </td>
                   <td><span class="small">${item.studentNumber || "-"}</span></td>
                   <td><strong>${escapeHtml(item.studentName)}</strong></td>
                   <td>${formatDate(item.birthDate)}</td>
@@ -238,12 +249,6 @@ function render() {
                          </a>`
                       : `<span class="phone" title="Número inválido">${escapeHtml(item.contactPhone)}</span>`
                     }
-                  </td>
-                  <td>
-                    <div class="actions">
-                      <button class="btn small-btn" type="button" data-action="edit-student" data-id="${item.id}">Editar</button>
-                      <button class="btn danger small-btn" type="button" data-action="delete-student" data-id="${item.id}">Excluir</button>
-                    </div>
                   </td>
                 </tr>
               `;
@@ -266,10 +271,15 @@ function render() {
         <div class="room-body">
           <div class="room-toolbar">
             <span class="small">Gerenciar sala ${escapeHtml(group.room)}</span>
-            <div class="room-actions">
+            <div class="actions">
               <button class="btn small-btn primary" type="button" data-action="add-student-room" data-room="${escapeHtml(group.room)}">Adicionar aluno</button>
               <button class="btn small-btn" type="button" data-action="edit-room" data-room="${escapeHtml(group.room)}">Editar sala</button>
               <button class="btn small-btn danger" type="button" data-action="delete-room" data-room="${escapeHtml(group.room)}">Excluir sala</button>
+              
+              <div class="room-actions-group">
+                <button class="btn small-btn" type="button" data-action="edit-selected" ${!canEdit ? "disabled" : ""} title="${canEdit ? "Editar aluno selecionado" : "Selecione exatamente 1 aluno para editar"}">Editar Aluno</button>
+                <button class="btn small-btn danger" type="button" data-action="delete-selected" ${!canDelete ? "disabled" : ""} title="${canDelete ? "Excluir selecionados" : "Selecione alunos para excluir"}">Excluir Aluno</button>
+              </div>
             </div>
           </div>
           ${body}
@@ -320,12 +330,19 @@ function startStudentEdit(id) {
   document.getElementById("formPanel").scrollIntoView({ behavior: "smooth", block: "start" });
 }
 
-function deleteStudent(id) {
-  const item = students.find(student => String(student.id) === String(id));
-  if (!item) return;
-  if (!confirm(`Excluir o aluno ${item.studentName}?`)) return;
-  students = students.filter(student => String(student.id) !== String(id));
-  if (String(editingStudentId) === String(id)) resetStudentForm();
+function deleteStudents(ids) {
+  const toDelete = students.filter(s => ids.has(String(s.id)));
+  if (!toDelete.length) return;
+  
+  const names = toDelete.map(s => s.studentName).join(", ");
+  if (!confirm(`Excluir ${toDelete.length} aluno(s): ${names}?`)) return;
+  
+  students = students.filter(s => !ids.has(String(s.id)));
+  ids.forEach(id => {
+    if (String(editingStudentId) === id) resetStudentForm();
+    selectedStudentIds.delete(id);
+  });
+  
   saveData();
   render();
 }
@@ -652,8 +669,28 @@ roomsList.addEventListener("click", event => {
   if (action === "add-student-room") addStudentForRoom(room);
   if (action === "edit-room") startRoomEdit(room);
   if (action === "delete-room") deleteRoom(room);
-  if (action === "edit-student") startStudentEdit(id);
-  if (action === "delete-student") deleteStudent(id);
+  
+  if (action === "select-student") {
+    if (trigger.checked) {
+      selectedStudentIds.add(String(id));
+    } else {
+      selectedStudentIds.delete(String(id));
+    }
+    render();
+  }
+  
+  if (action === "edit-selected") {
+    if (selectedStudentIds.size === 1) {
+      const idToEdit = Array.from(selectedStudentIds)[0];
+      startStudentEdit(idToEdit);
+    }
+  }
+  
+  if (action === "delete-selected") {
+    if (selectedStudentIds.size > 0) {
+      deleteStudents(selectedStudentIds);
+    }
+  }
 });
 
 search.addEventListener("input", render);
@@ -668,6 +705,7 @@ document.getElementById("clearFilters").addEventListener("click", () => {
   search.value = "";
   roomFilter.value = "";
   sortOrder.value = "insertion";
+  selectedStudentIds.clear();
   render();
 });
 
@@ -735,6 +773,7 @@ studentForm.addEventListener("submit", event => {
 
   if (editingStudentId) {
     students = students.map(student => String(student.id) === String(editingStudentId) ? item : student);
+    selectedStudentIds.clear(); // Clear selection after edit
   } else {
     students = [item, ...students];
   }
