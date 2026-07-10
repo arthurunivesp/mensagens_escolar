@@ -1,10 +1,10 @@
 const firstNames = ["Ana", "Bruno", "Carla", "Daniel", "Eduarda", "Felipe", "Gabriela", "Henrique", "Isabela", "Joao", "Karina", "Lucas", "Mariana", "Nicolas", "Olivia", "Pedro", "Rafaela", "Samuel", "Talita", "Vinicius", "Yasmin", "Caio", "Bianca", "Davi", "Helena"];
     const lastNames = ["Silva", "Santos", "Oliveira", "Souza", "Pereira", "Costa", "Rodrigues", "Almeida", "Nascimento", "Lima", "Araujo", "Fernandes", "Carvalho", "Gomes", "Ribeiro", "Martins", "Barbosa", "Rocha", "Dias", "Teixeira"];
     const parentNames = ["Maria", "Jose", "Patricia", "Carlos", "Fernanda", "Roberto", "Juliana", "Marcos", "Camila", "Ricardo", "Aline", "Paulo", "Luciana", "Andre", "Renata", "Sergio"];
-    const defaultRooms = ["1A", "1B", "2A", "2B", "3A", "3B", "4A", "4B", "5A", "5B", "6A", "6B", "7A", "7B", "8A", "8B", "9A", "9B", "1EM", "2EM"];
+    const defaultRooms = ["1A", "1B", "2A", "2B", "3A", "3B","6A", "6B", "6C", "7A", "7B", "8A", "8B", "9A", "9B"];
     const storageKey = "agenda-escolar-contatos-v1";
     const messageStorageKey = "agenda-escolar-mensagem-v1";
-    const defaultMessageTemplate = "Ola, estou entrando em contato pela escola sobre o aluno {aluno}, da sala {sala}.";
+    const defaultMessageTemplate = "Ola, estou entrando em contato pela escola Armando Gonçalves sobre o aluno {aluno}, da sala {sala}.";
 
     let students = [];
     let rooms = [];
